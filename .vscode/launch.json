@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Integrated Browser",
+      "request": "launch",
+      "type": "editor-browser",
+      "url": "http://localhost:34115/",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Debug painscaler",
+      "type": "go",
+      "mode": "auto",
+      "request": "launch",
+      "program": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug apigen",
+      "type": "go",
+      "mode": "auto",
+      "request": "launch",
+      "program": "${workspaceFolder}/apigen"
+    },
+    {
+      "name": "Debug graphtest",
+      "type": "go",
+      "mode": "auto",
+      "request": "launch",
+      "program": "${workspaceFolder}/cmd/graphtest",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

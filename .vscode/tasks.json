@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build debug",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "CGO_ENABLED": "0"
+        }
+      },
+      "command": "wails",
+      "args": [
+        "build",
+        "-tags",
+        "webkit2_41",
+        "-debug",
+        "-devtools",
+        "-o",
+        "painscaler"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
+  

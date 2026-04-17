@@ -1,0 +1,15 @@
+node_modules
+frontend/node_modules
+frontend/dist
+build/bin
+.git
+.github
+.vscode
+.idea
+*.md
+deploy
+sessions
+.claude
+CLAUDE.md
+.env
+*.log
