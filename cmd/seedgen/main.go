@@ -371,6 +371,9 @@ func buildPolicies() []policysetcontrollerv2.PolicyRuleResource {
 	}
 
 	out := make([]policysetcontrollerv2.PolicyRuleResource, 0, len(defs))
+	// Invert eval position (d.order, 1 = first) into Priority descending, so
+	// the simulator's highest-Priority-wins sort matches the intended order.
+	maxOrder := len(defs)
 	for _, d := range defs {
 		disabled := "FALSE"
 		if d.disabled {
@@ -384,8 +387,7 @@ func buildPolicies() []policysetcontrollerv2.PolicyRuleResource {
 			ID:                 d.id,
 			Name:               d.name,
 			Action:             d.action,
-			RuleOrder:          strconv.Itoa(d.order),
-			Priority:           strconv.Itoa(d.order),
+			Priority:           strconv.Itoa(maxOrder - d.order + 1),
 			Disabled:           disabled,
 			Operator:           "AND",
 			PolicyType:         "1",

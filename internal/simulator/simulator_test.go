@@ -38,9 +38,9 @@ func opLHS(objectType, lhs, rhs string) policysetcontrollerv2.PolicyRuleResource
 	return policysetcontrollerv2.PolicyRuleResourceOperands{ObjectType: objectType, LHS: lhs, RHS: rhs}
 }
 
-func policy(id, action, ruleOrder string, operator string, conds ...policysetcontrollerv2.PolicyRuleResourceConditions) *policysetcontrollerv2.PolicyRuleResource {
+func policy(id, action, priority string, operator string, conds ...policysetcontrollerv2.PolicyRuleResourceConditions) *policysetcontrollerv2.PolicyRuleResource {
 	return &policysetcontrollerv2.PolicyRuleResource{
-		ID: id, Name: id, Action: action, RuleOrder: ruleOrder, Operator: operator, Conditions: conds,
+		ID: id, Name: id, Action: action, Priority: priority, Operator: operator, Conditions: conds,
 	}
 }
 
@@ -160,25 +160,26 @@ func TestResolveSegment_WildcardParent(t *testing.T) {
 
 // TestSortRules_OrderAndDisabled verifies two invariants at once:
 // (1) rules with Disabled="1" are skipped entirely and must not appear in
-// the trace, and (2) remaining rules are evaluated in ascending RuleOrder,
-// so the lowest-order matching rule wins. Critical for deterministic
+// the trace, and (2) remaining rules are evaluated in descending Priority,
+// so the highest-Priority matching rule wins. Critical for deterministic
 // policy outcomes.
 func TestSortRules_OrderAndDisabled(t *testing.T) {
 	idx := newIdx()
 	idx.Segments["seg1"] = &applicationsegment.ApplicationSegmentResource{ID: "seg1"}
 
-	// Rule order 2 is DENY allow-all; rule order 1 is ALLOW allow-all.
-	// Disabled rule is inserted with order 0 but should be skipped.
-	disabled := policy("dis", "ALLOW", "0", "AND")
+	// Priority 2 is ALLOW allow-all; Priority 1 is DENY allow-all. The
+	// disabled rule is inserted with the highest Priority (99) to prove it
+	// would win if evaluated, and must be skipped.
+	disabled := policy("dis", "ALLOW", "99", "AND")
 	disabled.Disabled = "1"
 	idx.Policies["dis"] = disabled
-	idx.Policies["allow"] = policy("allow", "ALLOW", "1", "AND")
-	idx.Policies["deny"] = policy("deny", "DENY", "2", "AND")
+	idx.Policies["allow"] = policy("allow", "ALLOW", "2", "AND")
+	idx.Policies["deny"] = policy("deny", "DENY", "1", "AND")
 
 	s := NewSimulator(idx)
 	r, _ := s.Run(context.Background(), baseCtx())
 	if r.Action != "ALLOW" {
-		t.Errorf("Action = %q, want ALLOW (lowest non-disabled rule wins)", r.Action)
+		t.Errorf("Action = %q, want ALLOW (highest-Priority non-disabled rule wins)", r.Action)
 	}
 	if r.MatchedRule == nil || r.MatchedRule.ID != "allow" {
 		t.Errorf("matched rule = %+v", r.MatchedRule)

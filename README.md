@@ -20,8 +20,11 @@ Run both on the same host, or better in two containers on a shared network. Use 
 
 ## Scripts
 
-- `go run ./cmd/...` - start the backend.
+- `go run ./cmd/painscaler` - start the backend.
+- `go run ./cmd/seedgen -out snapshot.json` - produce a synthetic snapshot for demo mode (no ZPA tenant needed).
 - `cd frontend && yarn dev` - start the frontend with the Vite proxy pointed at the backend.
 - `cd frontend && yarn build` - production build. Bundle stats land in `dist/stats.html`.
 - `cd frontend && yarn test` - Vitest + RTL + MSW.
 - `go run ./apigen` - regenerates the TS client + models from Go handlers.
+
+Run without a ZPA tenant: `PAINSCALER_DEMO_SEED=$PWD/snapshot.json go run ./cmd/painscaler`. See `docs/src/content/docs/deployment/demo-mode.md`.

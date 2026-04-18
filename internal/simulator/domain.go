@@ -31,7 +31,7 @@ type ConditionResult struct {
 type RuleTrace struct {
 	RuleID     string            `json:"rule_id,omitempty"`
 	RuleName   string            `json:"rule_name,omitempty"`
-	RuleOrder  int               `json:"rule_order,omitempty"`
+	Priority   int               `json:"priority,omitempty"`
 	Action     string            `json:"action,omitempty"`
 	Matched    bool              `json:"matched,omitempty"`
 	SkipReason string            `json:"skip_reason,omitempty"`

@@ -124,7 +124,7 @@ func BuildIndex(ctx context.Context) (*Index, error) {
 			slog.Warn("dropped policy",
 				slog.String("id", p.ID),
 				slog.String("name", p.Name),
-				slog.String("ruleOrder", p.RuleOrder),
+				slog.String("priority", p.Priority),
 				slog.String("reason", reason))
 			continue
 		}
@@ -253,14 +253,14 @@ func BuildIndex(ctx context.Context) (*Index, error) {
 }
 
 // validatePolicy rejects policies that would poison the index: empty IDs
-// collide to one map slot, and non-numeric RuleOrder values silently sort
+// collide to one map slot, and non-numeric Priority values silently sort
 // as 0 in the simulator, quietly reordering real rules.
 func validatePolicy(p *policysetcontrollerv2.PolicyRuleResource) (string, bool) {
 	if p.ID == "" {
 		return "empty ID", false
 	}
-	if _, err := strconv.Atoi(p.RuleOrder); err != nil {
-		return "non-numeric RuleOrder", false
+	if _, err := strconv.Atoi(p.Priority); err != nil {
+		return "non-numeric Priority", false
 	}
 	return "", true
 }

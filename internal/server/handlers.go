@@ -422,7 +422,7 @@ func (s *Server) RunSimulation(user string, simCtx simulator.SimContext) (*simul
 type VirtualPolicyInput struct {
 	Name            string   `json:"name"`
 	Action          string   `json:"action"`
-	RuleOrder       string   `json:"ruleOrder"`
+	Priority        string   `json:"priority"`
 	ScimGroupIDs    []string `json:"scimGroupIds,omitempty"`
 	SegmentIDs      []string `json:"segmentIds,omitempty"`
 	SegmentGroupIDs []string `json:"segmentGroupIds,omitempty"`
@@ -485,12 +485,12 @@ func buildVirtualRule(in VirtualPolicyInput) *policysetcontrollerv2.PolicyRuleRe
 	}
 
 	return &policysetcontrollerv2.PolicyRuleResource{
-		ID:        "virtual:" + uuid.NewString(),
-		Name:      in.Name,
-		Action:    in.Action,
-		RuleOrder: in.RuleOrder,
-		Disabled:  "0",
-		Operator:  "AND",
+		ID:       "virtual:" + uuid.NewString(),
+		Name:     in.Name,
+		Action:   in.Action,
+		Priority: in.Priority,
+		Disabled: "0",
+		Operator: "AND",
 		Conditions: []policysetcontrollerv2.PolicyRuleResourceConditions{
 			{Operator: "OR", Operands: operands},
 		},
