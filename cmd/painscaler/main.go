@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/painscaler/painscaler/internal/fetcher"
 	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/painscaler/painscaler/internal/server"
 )
@@ -40,6 +41,7 @@ func main() {
 		Version: version,
 		Commit:  commit,
 		Date:    date,
+		Demo:    fetcher.DemoSeedPath() != "",
 	})
 	if err != nil {
 		slog.Error("init server", slog.String("error", err.Error()))

@@ -141,7 +141,14 @@ func GetClient() (*zscaler.Service, error) {
 // Fetch loads all ZPA resources in parallel. It returns a Snapshot and a
 // slice of non-fatal errors for resources that failed to load. A nil
 // Snapshot means the client itself could not be created.
+//
+// When the PAINSCALER_DEMO_SEED env var points to a JSON file, Fetch skips
+// ZPA entirely and returns the deserialized Snapshot from disk.
 func Fetch(ctx context.Context) (*Snapshot, []FetchError) {
+	if path := DemoSeedPath(); path != "" {
+		return loadDemoSnapshot(path)
+	}
+
 	// Authenticate up front so all CachedFetch calls below short-circuit on
 	// client failure rather than each producing the same error.
 	if _, err := GetClient(); err != nil {
