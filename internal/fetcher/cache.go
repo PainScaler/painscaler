@@ -66,9 +66,43 @@ func (c *Cache[T]) Invalidate() {
 	c.mu.Unlock()
 }
 
+// Set stores data in the cache and marks it fresh. Used by demo-mode seeding
+// so subsequent Get calls return the seeded data without invoking fetch.
+func (c *Cache[T]) Set(data T) {
+	c.mu.Lock()
+	c.data = data
+	c.fetchedAt = time.Now()
+	c.mu.Unlock()
+}
+
+// SeedFromSnapshot writes snap's data into every cache entry, marking each
+// fresh. Used by demo mode so BuildIndex and other CachedFetch callers return
+// the seeded data without contacting ZPA.
+func (c *CachedSnapshot) SeedFromSnapshot(snap *Snapshot) {
+	c.ClientTypes.Set(snap.ClientTypes)
+	c.Segments.Set(snap.Segments)
+	c.SegmentGroups.Set(snap.SegmentGroups)
+	c.AppConnectors.Set(snap.AppConnectors)
+	c.AppConnectorGroups.Set(snap.AppConnectorGroups)
+	c.AccessPolicies.Set(snap.AccessPolicies)
+	c.ScimGroups.Set(snap.ScimGroups)
+	c.ServerGroups.Set(snap.ServerGroups)
+	c.ApplicationServers.Set(snap.ApplicationServers)
+	c.TrustedNetworks.Set(snap.TrustedNetworks)
+	c.PostureProfiles.Set(snap.PostureProfiles)
+	c.Platforms.Set(snap.Platforms)
+	c.IdpControllers.Set(snap.IdpControllers)
+	c.ScimAttributeHeaders.Set(snap.ScimAttributeHeaders)
+	c.Certificates.Set(snap.Certificates)
+}
+
 // InvalidateAll marks every cache entry stale so the next Fetch reloads all
-// resources from the upstream API.
+// resources from the upstream API. No-op in demo mode so the seeded snapshot
+// survives UI refresh actions.
 func (c *CachedSnapshot) InvalidateAll() {
+	if DemoSeedPath() != "" {
+		return
+	}
 	c.ClientTypes.Invalidate()
 	c.Segments.Invalidate()
 	c.SegmentGroups.Invalidate()

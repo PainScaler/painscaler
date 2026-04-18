@@ -7,36 +7,30 @@ import (
 	"testing"
 )
 
-func TestFetchDemoSeed(t *testing.T) {
+func TestSeedDemoCacheServesFromFetch(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "snap.json")
-	if err := os.WriteFile(path, []byte(`{"Segments":[],"AccessPolicies":[]}`), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(`{"Segments":[{"id":"seg1","name":"one","enabled":true}]}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	t.Setenv(DemoSeedEnv, path)
 
+	if err := SeedDemoCache(path); err != nil {
+		t.Fatalf("SeedDemoCache: %v", err)
+	}
+
 	snap, errs := Fetch(context.Background())
 	if len(errs) != 0 {
-		t.Fatalf("unexpected errs: %v", errs)
+		t.Fatalf("fetch errs: %v", errs)
 	}
-	if snap == nil {
-		t.Fatal("nil snapshot")
-	}
-	if snap.Segments == nil {
-		t.Fatalf("segments should decode to empty slice, got nil")
+	if snap == nil || len(snap.Segments) != 1 || snap.Segments[0].ID != "seg1" {
+		t.Fatalf("seeded segment missing from fetch result: %+v", snap)
 	}
 }
 
-func TestFetchDemoSeedMissingFile(t *testing.T) {
+func TestSeedDemoCacheMissingFile(t *testing.T) {
 	t.Setenv(DemoSeedEnv, "/does/not/exist.json")
-	snap, errs := Fetch(context.Background())
-	if snap != nil {
-		t.Fatalf("expected nil snapshot on load failure")
-	}
-	if len(errs) == 0 {
-		t.Fatalf("expected FetchError")
-	}
-	if errs[0].Resource != "demo_seed" {
-		t.Fatalf("want resource=demo_seed, got %q", errs[0].Resource)
+	if err := SeedDemoCache("/does/not/exist.json"); err == nil {
+		t.Fatal("expected error for missing seed file")
 	}
 }

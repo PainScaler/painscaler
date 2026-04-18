@@ -77,23 +77,30 @@ var (
 
 func GetCache() *CachedSnapshot {
 	cachedSnapshotOnce.Do(func() {
+		short, long := 5*time.Minute, time.Hour
+		// In demo mode the cache is seeded from disk and never refreshed from
+		// ZPA, so TTL must never expire or the CachedFetch fallback would fire
+		// (and fail for lack of a client).
+		if DemoSeedPath() != "" {
+			short, long = 100*365*24*time.Hour, 100*365*24*time.Hour
+		}
 		cachedSnapshot = &CachedSnapshot{
-			ClientTypes:          Cache[[]string]{ttl: time.Hour},
-			Segments:             Cache[[]applicationsegment.ApplicationSegmentResource]{ttl: 5 * time.Minute},
-			SegmentGroups:        Cache[[]segmentgroup.SegmentGroup]{ttl: 5 * time.Minute},
-			AppConnectors:        Cache[[]appconnectorcontroller.AppConnector]{ttl: 5 * time.Minute},
-			AppConnectorGroups:   Cache[[]appconnectorgroup.AppConnectorGroup]{ttl: 5 * time.Minute},
-			AccessPolicies:       Cache[[]policysetcontrollerv2.PolicyRuleResource]{ttl: 5 * time.Minute},
-			ScimGroups:           Cache[[]scimgroup.ScimGroup]{ttl: 5 * time.Minute},
-			ServerGroups:         Cache[[]servergroup.ServerGroup]{ttl: 5 * time.Minute},
-			ApplicationServers:   Cache[[]appservercontroller.ApplicationServer]{ttl: 5 * time.Minute},
-			TrustedNetworks:      Cache[[]trustednetwork.TrustedNetwork]{ttl: 5 * time.Minute},
-			PostureProfiles:      Cache[[]postureprofile.PostureProfile]{ttl: 5 * time.Minute},
-			Platforms:            Cache[[]string]{ttl: time.Hour},
-			IdpControllers:       Cache[[]idpcontroller.IdpController]{ttl: time.Hour},
-			ScimAttributeHeaders: Cache[[]scimattributeheader.ScimAttributeHeader]{ttl: time.Hour},
+			ClientTypes:          Cache[[]string]{ttl: long},
+			Segments:             Cache[[]applicationsegment.ApplicationSegmentResource]{ttl: short},
+			SegmentGroups:        Cache[[]segmentgroup.SegmentGroup]{ttl: short},
+			AppConnectors:        Cache[[]appconnectorcontroller.AppConnector]{ttl: short},
+			AppConnectorGroups:   Cache[[]appconnectorgroup.AppConnectorGroup]{ttl: short},
+			AccessPolicies:       Cache[[]policysetcontrollerv2.PolicyRuleResource]{ttl: short},
+			ScimGroups:           Cache[[]scimgroup.ScimGroup]{ttl: short},
+			ServerGroups:         Cache[[]servergroup.ServerGroup]{ttl: short},
+			ApplicationServers:   Cache[[]appservercontroller.ApplicationServer]{ttl: short},
+			TrustedNetworks:      Cache[[]trustednetwork.TrustedNetwork]{ttl: short},
+			PostureProfiles:      Cache[[]postureprofile.PostureProfile]{ttl: short},
+			Platforms:            Cache[[]string]{ttl: long},
+			IdpControllers:       Cache[[]idpcontroller.IdpController]{ttl: long},
+			ScimAttributeHeaders: Cache[[]scimattributeheader.ScimAttributeHeader]{ttl: long},
 			ScimAttributeValues:  map[string]*Cache[[]string]{},
-			Certificates:         Cache[[]bacertificate.BaCertificate]{ttl: time.Hour},
+			Certificates:         Cache[[]bacertificate.BaCertificate]{ttl: long},
 		}
 	})
 	return cachedSnapshot
@@ -142,17 +149,16 @@ func GetClient() (*zscaler.Service, error) {
 // slice of non-fatal errors for resources that failed to load. A nil
 // Snapshot means the client itself could not be created.
 //
-// When the PAINSCALER_DEMO_SEED env var points to a JSON file, Fetch skips
-// ZPA entirely and returns the deserialized Snapshot from disk.
+// In demo mode (PAINSCALER_DEMO_SEED set, cache pre-seeded by SeedDemoCache)
+// every CachedFetch below returns the seeded data and GetClient is never
+// invoked, so no ZPA credentials are required.
 func Fetch(ctx context.Context) (*Snapshot, []FetchError) {
-	if path := DemoSeedPath(); path != "" {
-		return loadDemoSnapshot(path)
-	}
-
-	// Authenticate up front so all CachedFetch calls below short-circuit on
-	// client failure rather than each producing the same error.
-	if _, err := GetClient(); err != nil {
-		return nil, []FetchError{{Resource: "client", Err: err}}
+	// When a demo cache has been seeded, skip the upfront client check; each
+	// CachedFetch lazily authenticates only when it actually needs to fetch.
+	if DemoSeedPath() == "" {
+		if _, err := GetClient(); err != nil {
+			return nil, []FetchError{{Resource: "client", Err: err}}
+		}
 	}
 
 	snap := &Snapshot{}
@@ -255,14 +261,18 @@ func Fetch(ctx context.Context) (*Snapshot, []FetchError) {
 	return snap, errs
 }
 
-// CachedFetch retrieves a resource via c, calling fn only when the cache is stale.
+// CachedFetch retrieves a resource via c, calling fn only when the cache is
+// stale. GetClient is deferred into the fetch path so demo mode (with a
+// pre-seeded cache and no ZPA credentials) never attempts authentication.
 func CachedFetch[T any](ctx context.Context, c *Cache[T], fn func(context.Context, *zscaler.Service) (T, error)) (T, error) {
-	client, err := GetClient()
-	if err != nil {
-		var zero T
-		return zero, err
-	}
-	return c.Get(func() (T, error) { return fn(ctx, client) })
+	return c.Get(func() (T, error) {
+		client, err := GetClient()
+		if err != nil {
+			var zero T
+			return zero, err
+		}
+		return fn(ctx, client)
+	})
 }
 
 // namedFetch wraps CachedFetch with per-resource prom instrumentation. Used
