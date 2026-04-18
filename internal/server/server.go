@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

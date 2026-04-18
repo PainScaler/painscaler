@@ -54,9 +54,9 @@ func op(objectType, rhs string) policysetcontrollerv2.PolicyRuleResourceOperands
 	return policysetcontrollerv2.PolicyRuleResourceOperands{ObjectType: objectType, RHS: rhs}
 }
 
-func policy(id, name, action, ruleOrder string, conds ...policysetcontrollerv2.PolicyRuleResourceConditions) *policysetcontrollerv2.PolicyRuleResource {
+func policy(id, name, action, priority string, conds ...policysetcontrollerv2.PolicyRuleResourceConditions) *policysetcontrollerv2.PolicyRuleResource {
 	return &policysetcontrollerv2.PolicyRuleResource{
-		ID: id, Name: name, Action: action, RuleOrder: ruleOrder, Conditions: conds,
+		ID: id, Name: name, Action: action, Priority: priority, Conditions: conds,
 	}
 }
 

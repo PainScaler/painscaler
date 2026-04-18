@@ -23,8 +23,13 @@ builds:
         goarch: arm
       - goos: windows
         goarch: arm
-    main: .
+    main: ./cmd/painscaler
     binary: painscaler
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
 
 archives:
   - formats:

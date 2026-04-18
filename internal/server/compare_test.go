@@ -49,7 +49,7 @@ func TestBuildVirtualRule_ShapesOperands(t *testing.T) {
 	r := buildVirtualRule(VirtualPolicyInput{
 		Name:         "v",
 		Action:       "ALLOW",
-		RuleOrder:    "0",
+		Priority:     "0",
 		ScimGroupIDs: []string{"g1"},
 		SegmentIDs:   []string{"s1", "s2"},
 	})
@@ -71,13 +71,13 @@ func TestBuildVirtualRule_ShapesOperands(t *testing.T) {
 
 // TestCompare_BaselineVsOverlayFlipsDecision runs the simulator twice through
 // the same code path the handler uses: once against the real index (DENY via
-// an existing rule) and once against a clone with a virtual ALLOW at a lower
-// RuleOrder. It asserts the virtual rule changes the decision end-to-end.
+// an existing rule) and once against a clone with a virtual ALLOW at a higher
+// Priority. It asserts the virtual rule changes the decision end-to-end.
 func TestCompare_BaselineVsOverlayFlipsDecision(t *testing.T) {
 	idx := newIdx()
 	idx.Segments["seg1"] = &applicationsegment.ApplicationSegmentResource{ID: "seg1"}
 	idx.Policies["deny-all"] = &policysetcontrollerv2.PolicyRuleResource{
-		ID: "deny-all", Name: "deny-all", Action: "DENY", RuleOrder: "10",
+		ID: "deny-all", Name: "deny-all", Action: "DENY", Priority: "1",
 		Operator: "AND",
 		Conditions: []policysetcontrollerv2.PolicyRuleResourceConditions{
 			{Operator: "OR", Operands: []policysetcontrollerv2.PolicyRuleResourceOperands{
@@ -101,7 +101,7 @@ func TestCompare_BaselineVsOverlayFlipsDecision(t *testing.T) {
 	}
 
 	virtual := buildVirtualRule(VirtualPolicyInput{
-		Name: "allow-seg1", Action: "ALLOW", RuleOrder: "1",
+		Name: "allow-seg1", Action: "ALLOW", Priority: "10",
 		SegmentIDs: []string{"seg1"},
 	})
 	overlay := cloneIndexWithVirtual(idx, virtual)

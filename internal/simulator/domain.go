@@ -13,7 +13,6 @@ type SimContext struct {
 	FQDN           string            `json:"fqdn,omitempty"`
 }
 
-
 type OperandResult struct {
 	ObjectType  string `json:"object_type,omitempty"`
 	Matched     bool   `json:"matched,omitempty"`
@@ -32,7 +31,7 @@ type ConditionResult struct {
 type RuleTrace struct {
 	RuleID     string            `json:"rule_id,omitempty"`
 	RuleName   string            `json:"rule_name,omitempty"`
-	RuleOrder  int               `json:"rule_order,omitempty"`
+	Priority   int               `json:"priority,omitempty"`
 	Action     string            `json:"action,omitempty"`
 	Matched    bool              `json:"matched,omitempty"`
 	SkipReason string            `json:"skip_reason,omitempty"`

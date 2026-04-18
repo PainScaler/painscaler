@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/painscaler/painscaler/internal/fetcher"
 	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/painscaler/painscaler/internal/server"
 )
@@ -36,10 +37,18 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	if path := fetcher.DemoSeedPath(); path != "" {
+		if err := fetcher.SeedDemoCache(path); err != nil {
+			slog.Error("seed demo cache", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+	}
+
 	srv, err := server.New(server.About{
 		Version: version,
 		Commit:  commit,
 		Date:    date,
+		Demo:    fetcher.DemoSeedPath() != "",
 	})
 	if err != nil {
 		slog.Error("init server", slog.String("error", err.Error()))

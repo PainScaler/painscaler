@@ -14,14 +14,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/painscaler/painscaler/internal/analysis"
 	"github.com/painscaler/painscaler/internal/fetcher"
 	"github.com/painscaler/painscaler/internal/index"
 	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/painscaler/painscaler/internal/simulator"
 	"github.com/painscaler/painscaler/internal/storage"
-	"github.com/google/uuid"
-	"golang.org/x/sync/singleflight"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegment"
@@ -34,6 +33,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/trustednetwork"
+	"golang.org/x/sync/singleflight"
 )
 
 type Server struct {
@@ -96,6 +96,7 @@ type About struct {
 	Version string `json:"version"`
 	Commit  string `json:"commit"`
 	Date    string `json:"date"`
+	Demo    bool   `json:"demo"`
 }
 
 type Identity struct {
@@ -421,7 +422,7 @@ func (s *Server) RunSimulation(user string, simCtx simulator.SimContext) (*simul
 type VirtualPolicyInput struct {
 	Name            string   `json:"name"`
 	Action          string   `json:"action"`
-	RuleOrder       string   `json:"ruleOrder"`
+	Priority        string   `json:"priority"`
 	ScimGroupIDs    []string `json:"scimGroupIds,omitempty"`
 	SegmentIDs      []string `json:"segmentIds,omitempty"`
 	SegmentGroupIDs []string `json:"segmentGroupIds,omitempty"`
@@ -484,12 +485,12 @@ func buildVirtualRule(in VirtualPolicyInput) *policysetcontrollerv2.PolicyRuleRe
 	}
 
 	return &policysetcontrollerv2.PolicyRuleResource{
-		ID:        "virtual:" + uuid.NewString(),
-		Name:      in.Name,
-		Action:    in.Action,
-		RuleOrder: in.RuleOrder,
-		Disabled:  "0",
-		Operator:  "AND",
+		ID:       "virtual:" + uuid.NewString(),
+		Name:     in.Name,
+		Action:   in.Action,
+		Priority: in.Priority,
+		Disabled: "0",
+		Operator: "AND",
 		Conditions: []policysetcontrollerv2.PolicyRuleResourceConditions{
 			{Operator: "OR", Operands: operands},
 		},

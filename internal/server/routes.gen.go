@@ -2,10 +2,10 @@
 package server
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/painscaler/painscaler/internal/analysis"
 	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/painscaler/painscaler/internal/simulator"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )

@@ -110,10 +110,10 @@ type PolicyShadowReport struct {
 }
 
 type PolicySummary struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Action    string `json:"action"`
-	RuleOrder int    `json:"ruleOrder"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Action   string `json:"action"`
+	Priority int    `json:"priority"`
 }
 
 func PolicyShadows(idx *index.Index) []PolicyShadowReport {
@@ -228,9 +228,9 @@ func PolicyShadows(idx *index.Index) []PolicyShadowReport {
 		})
 	}
 
-	// Sort by lower rule order first
+	// Sort by highest PolicyA Priority first (heaviest evaluated earliest)
 	sort.Slice(reports, func(i, j int) bool {
-		return reports[i].PolicyA.RuleOrder < reports[j].PolicyA.RuleOrder
+		return reports[i].PolicyA.Priority > reports[j].PolicyA.Priority
 	})
 
 	return reports
@@ -526,12 +526,12 @@ func resolveScimName(idx *index.Index, id string) string {
 }
 
 func makePolicySummary(pol *policysetcontrollerv2.PolicyRuleResource) PolicySummary {
-	order, _ := strconv.Atoi(pol.RuleOrder)
+	priority, _ := strconv.Atoi(pol.Priority)
 	return PolicySummary{
-		ID:        pol.ID,
-		Name:      pol.Name,
-		Action:    pol.Action,
-		RuleOrder: order,
+		ID:       pol.ID,
+		Name:     pol.Name,
+		Action:   pol.Action,
+		Priority: priority,
 	}
 }
 

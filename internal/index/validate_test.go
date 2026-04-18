@@ -13,10 +13,10 @@ func TestValidatePolicy(t *testing.T) {
 		wantOK  bool
 		wantHas string
 	}{
-		{"good", policysetcontrollerv2.PolicyRuleResource{ID: "p1", RuleOrder: "1"}, true, ""},
-		{"empty ID", policysetcontrollerv2.PolicyRuleResource{ID: "", RuleOrder: "1"}, false, "empty ID"},
-		{"non-numeric order", policysetcontrollerv2.PolicyRuleResource{ID: "p1", RuleOrder: "abc"}, false, "non-numeric RuleOrder"},
-		{"empty order", policysetcontrollerv2.PolicyRuleResource{ID: "p1", RuleOrder: ""}, false, "non-numeric RuleOrder"},
+		{"good", policysetcontrollerv2.PolicyRuleResource{ID: "p1", Priority: "1"}, true, ""},
+		{"empty ID", policysetcontrollerv2.PolicyRuleResource{ID: "", Priority: "1"}, false, "empty ID"},
+		{"non-numeric priority", policysetcontrollerv2.PolicyRuleResource{ID: "p1", Priority: "abc"}, false, "non-numeric Priority"},
+		{"empty priority", policysetcontrollerv2.PolicyRuleResource{ID: "p1", Priority: ""}, false, "non-numeric Priority"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

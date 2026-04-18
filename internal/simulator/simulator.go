@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/painscaler/painscaler/internal/index"
 	"github.com/looplab/fsm"
+	"github.com/painscaler/painscaler/internal/index"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/policysetcontrollerv2"
 )
 
@@ -205,7 +205,8 @@ func (s *Simulator) onSortRules(ctx context.Context, e *fsm.Event) {
 		return
 	}
 
-	// Collect and sort by RuleOrder (string -> int). Skip disabled rules.
+	// Collect and sort by Priority (string -> int), descending so the
+	// heaviest (highest-Priority) rule evaluates first. Skip disabled rules.
 	var rules []*policysetcontrollerv2.PolicyRuleResource
 	for id := range idx.Policies {
 		r := idx.Policies[id]
@@ -217,9 +218,9 @@ func (s *Simulator) onSortRules(ctx context.Context, e *fsm.Event) {
 		rules = append(rules, r)
 	}
 	sort.Slice(rules, func(i, j int) bool {
-		oi, _ := strconv.Atoi(rules[i].RuleOrder)
-		oj, _ := strconv.Atoi(rules[j].RuleOrder)
-		return oi < oj
+		pi, _ := strconv.Atoi(rules[i].Priority)
+		pj, _ := strconv.Atoi(rules[j].Priority)
+		return pi > pj
 	})
 
 	s.fsm.SetMetadata(metaRules, rules)
@@ -277,13 +278,13 @@ func (s *Simulator) onEvalConditions(ctx context.Context, e *fsm.Event) {
 	}
 
 	rule := rules[cursor]
-	order, _ := strconv.Atoi(rule.RuleOrder)
+	priority, _ := strconv.Atoi(rule.Priority)
 
 	trace := RuleTrace{
-		RuleID:    rule.ID,
-		RuleName:  rule.Name,
-		RuleOrder: order,
-		Action:    rule.Action,
+		RuleID:   rule.ID,
+		RuleName: rule.Name,
+		Priority: priority,
+		Action:   rule.Action,
 	}
 
 	// Evaluate all condition blocks, then combine with rule.Operator.

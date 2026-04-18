@@ -117,15 +117,9 @@ func BuildFlowGraph(idx *index.Index, data GraphQueryBody) FlowGraph {
 		policies = append(policies, polEntry{id, p})
 	}
 	slices.SortFunc(policies, func(a, b polEntry) int {
-		ao, _ := strconv.Atoi(a.pol.RuleOrder)
-		bo, _ := strconv.Atoi(b.pol.RuleOrder)
-		if ao == 0 {
-			ao = 999
-		}
-		if bo == 0 {
-			bo = 999
-		}
-		return ao - bo
+		ap, _ := strconv.Atoi(a.pol.Priority)
+		bp, _ := strconv.Atoi(b.pol.Priority)
+		return bp - ap
 	})
 
 	// Pre-build segment -> connector groups via standalone server groups
@@ -477,15 +471,9 @@ func BuildRoutes(idx *index.Index) RouteMatrix {
 		policies = append(policies, polEntry{id, p})
 	}
 	slices.SortFunc(policies, func(a, b polEntry) int {
-		ao, _ := strconv.Atoi(a.pol.RuleOrder)
-		bo, _ := strconv.Atoi(b.pol.RuleOrder)
-		if ao == 0 {
-			ao = 999
-		}
-		if bo == 0 {
-			bo = 999
-		}
-		return ao - bo
+		ap, _ := strconv.Atoi(a.pol.Priority)
+		bp, _ := strconv.Atoi(b.pol.Priority)
+		return bp - ap
 	})
 
 	var routes []Route

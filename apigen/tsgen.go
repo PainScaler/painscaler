@@ -378,11 +378,11 @@ func goTypeStringToTS(goType string) (string, []string) {
 type tsRoute struct {
 	FuncName  string
 	Method    string
-	URL       string   // TS template literal or plain string
+	URL       string // TS template literal or plain string
 	HasBody   bool
-	BodyArg   string   // TS arg name for body payload, or ""
-	SigParams string   // "name: Type, name2: Type2"
-	ReturnTS  string   // TS return type expression (without Promise<>)
+	BodyArg   string // TS arg name for body payload, or ""
+	SigParams string // "name: Type, name2: Type2"
+	ReturnTS  string // TS return type expression (without Promise<>)
 	IsVoid    bool
 }
 
