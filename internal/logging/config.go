@@ -9,17 +9,17 @@ import (
 )
 
 type Config struct {
-	Dir         string
-	File        string
-	Level       slog.Level
-	MaxSizeMB   int
-	MaxBackups  int
-	MaxAgeDays  int
-	Compress    bool
-	Service     string
-	Version     string
-	Commit      string
-	BuildDate   string
+	Dir        string
+	File       string
+	Level      slog.Level
+	MaxSizeMB  int
+	MaxBackups int
+	MaxAgeDays int
+	Compress   bool
+	Service    string
+	Version    string
+	Commit     string
+	BuildDate  string
 }
 
 func ConfigFromEnv() Config {

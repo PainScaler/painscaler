@@ -34,10 +34,10 @@ func TestBuildFlowGraph_Basic(t *testing.T) {
 	}
 
 	wantEdges := map[string]bool{
-		"g:100->p:pol1":    false,
-		"p:pol1->cg:cg1":   false,
-		"cg:cg1->sg:grp1":  false,
-		"sg:grp1->s:seg1":  false,
+		"g:100->p:pol1":   false,
+		"p:pol1->cg:cg1":  false,
+		"cg:cg1->sg:grp1": false,
+		"sg:grp1->s:seg1": false,
 	}
 	for _, e := range graph.Edges {
 		if _, ok := wantEdges[e.ID]; ok {

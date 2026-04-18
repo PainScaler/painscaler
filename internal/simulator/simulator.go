@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/painscaler/painscaler/internal/index"
 	"github.com/looplab/fsm"
+	"github.com/painscaler/painscaler/internal/index"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/policysetcontrollerv2"
 )
 

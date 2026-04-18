@@ -113,13 +113,13 @@ func buildClientTypes() []string {
 // struct by buildSegments. Keeping the table separate makes the topology
 // easy to audit at a glance.
 type segmentDef struct {
-	id        string
-	name      string
-	domain    string
-	group     string
-	enabled   bool
-	tcpPort   string
-	showcase  string // "orphan", "overlap-a", "overlap-b", or ""
+	id       string
+	name     string
+	domain   string
+	group    string
+	enabled  bool
+	tcpPort  string
+	showcase string // "orphan", "overlap-a", "overlap-b", or ""
 }
 
 var segmentDefs = []segmentDef{
@@ -166,13 +166,13 @@ func buildSegments() []applicationsegment.ApplicationSegmentResource {
 	out := make([]applicationsegment.ApplicationSegmentResource, 0, len(segmentDefs))
 	for _, d := range segmentDefs {
 		out = append(out, applicationsegment.ApplicationSegmentResource{
-			ID:             d.id,
-			Name:           d.name,
-			DomainNames:    []string{d.domain},
-			Enabled:        d.enabled,
-			SegmentGroupID: d.group,
-			TCPPortRanges:  []string{d.tcpPort, d.tcpPort},
-			BypassType:     "NEVER",
+			ID:              d.id,
+			Name:            d.name,
+			DomainNames:     []string{d.domain},
+			Enabled:         d.enabled,
+			SegmentGroupID:  d.group,
+			TCPPortRanges:   []string{d.tcpPort, d.tcpPort},
+			BypassType:      "NEVER",
 			HealthReporting: "ON_ACCESS",
 		})
 	}
@@ -292,13 +292,13 @@ func buildPostureProfiles() []postureprofile.PostureProfile {
 
 // policyDef captures the rule shape without the SDK-struct boilerplate.
 type policyDef struct {
-	id             string
-	name           string
-	action         string
-	order          int
-	disabled       bool
-	operands       []policysetcontrollerv2.PolicyRuleResourceOperands
-	connectorGrps  []string
+	id            string
+	name          string
+	action        string
+	order         int
+	disabled      bool
+	operands      []policysetcontrollerv2.PolicyRuleResourceOperands
+	connectorGrps []string
 }
 
 func buildPolicies() []policysetcontrollerv2.PolicyRuleResource {

@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/joho/godotenv"
+	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"

@@ -14,14 +14,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/painscaler/painscaler/internal/analysis"
 	"github.com/painscaler/painscaler/internal/fetcher"
 	"github.com/painscaler/painscaler/internal/index"
 	"github.com/painscaler/painscaler/internal/logging"
 	"github.com/painscaler/painscaler/internal/simulator"
 	"github.com/painscaler/painscaler/internal/storage"
-	"github.com/google/uuid"
-	"golang.org/x/sync/singleflight"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegment"
@@ -34,6 +33,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/trustednetwork"
+	"golang.org/x/sync/singleflight"
 )
 
 type Server struct {

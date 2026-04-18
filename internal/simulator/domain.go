@@ -13,7 +13,6 @@ type SimContext struct {
 	FQDN           string            `json:"fqdn,omitempty"`
 }
 
-
 type OperandResult struct {
 	ObjectType  string `json:"object_type,omitempty"`
 	Matched     bool   `json:"matched,omitempty"`
