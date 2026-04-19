@@ -4,6 +4,3 @@
 [submodule "docs"]
 	path = docs
 	url = git@github.com:PainScaler/docs.git
-[submodule "deploy"]
-	path = deploy
-	url = git@github.com:PainScaler/deploy.git
